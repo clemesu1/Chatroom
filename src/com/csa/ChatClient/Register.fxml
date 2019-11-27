@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Hyperlink?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.csa.ChatClient.RegisterController">
+   <children>
+      <VBox alignment="BASELINE_CENTER" prefHeight="200.0" prefWidth="100.0">
+         <children>
+            <Label text="Register Account">
+               <font>
+                  <Font size="18.0" />
+               </font>
+               <VBox.margin>
+                  <Insets bottom="15.0" top="15.0" />
+               </VBox.margin>
+            </Label>
+            <TextField fx:id="txtUsername" promptText="Username">
+               <font>
+                  <Font size="18.0" />
+               </font>
+               <VBox.margin>
+                  <Insets bottom="15.0" left="40.0" right="40.0" top="15.0" />
+               </VBox.margin>
+            </TextField>
+            <PasswordField fx:id="txtPassword" promptText="Password">
+               <font>
+                  <Font size="18.0" />
+               </font>
+               <VBox.margin>
+                  <Insets bottom="15.0" left="40.0" right="40.0" top="15.0" />
+               </VBox.margin>
+            </PasswordField>
+            <PasswordField fx:id="txtConfirmPassword" promptText="Confirm Password">
+               <font>
+                  <Font size="18.0" />
+               </font>
+               <VBox.margin>
+                  <Insets bottom="15.0" left="40.0" right="40.0" top="15.0" />
+               </VBox.margin>
+            </PasswordField>
+            <HBox alignment="BASELINE_LEFT" prefHeight="29.0" prefWidth="400.0">
+               <children>
+                  <Label fx:id="lblError" textFill="RED">
+                     <HBox.margin>
+                        <Insets left="40.0" right="40.0" />
+                     </HBox.margin>
+                  </Label>
+               </children>
+            </HBox>
+            <Button fx:id="btnRegister" mnemonicParsing="false" onAction="#Register" text="Register">
+               <font>
+                  <Font size="18.0" />
+               </font>
+               <VBox.margin>
+                  <Insets />
+               </VBox.margin>
+            </Button>
+            <HBox alignment="CENTER" prefHeight="29.0" prefWidth="400.0">
+               <children>
+                  <Label text="Already have an account?" />
+                  <Hyperlink fx:id="btnLogin" onAction="#Login" text="Login" />
+               </children>
+               <VBox.margin>
+                  <Insets top="20.0" />
+               </VBox.margin>
+            </HBox>
+         </children>
+      </VBox>
+   </children>
+</StackPane>
