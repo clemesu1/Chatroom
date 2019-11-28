@@ -41,6 +41,7 @@ public class RegisterController {
 	public void Register(ActionEvent event) throws IOException {
 		
 		client = Main.getClient();
+		client.connect();
 		
 		String username;
 		String password;
@@ -51,31 +52,18 @@ public class RegisterController {
 						
 			if(client.register(username, password)) {
                 System.out.println("Register Successful");
-                try {
-        			FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/csa/ChatClient/Login.fxml"));
-        			
-        			Parent root = loader.load();
-        			
-        			Scene scene = new Scene(root,400,400);
-        			Stage primaryStage = new Stage();
-        			        			
-        			primaryStage.setScene(scene);
-        			primaryStage.setResizable(false);
-        			primaryStage.show();
-        			
-        			Stage stage = (Stage) btnLogin.getScene().getWindow();
-        			stage.close();
-        			
-        		} catch (IOException e) {
-        			e.printStackTrace();
-        		}
+                if(client.login(username, password)) {
+                	System.out.println("Login Successfull");
+                }
+                else {
+                	System.err.println("Login Failed");
+                }
             }
             else {
                 System.err.println("Register Failed");
             }
 		}
 		else {
-			
 			lblError.setText("Please make sure your passwords match");
 		}
 		
@@ -92,6 +80,7 @@ public class RegisterController {
 
 			primaryStage.setScene(scene);
 			primaryStage.setResizable(false);
+			primaryStage.setTitle("Login to Chatroom");
 			primaryStage.show();
 			
 			Stage stage = (Stage) btnLogin.getScene().getWindow();

@@ -23,33 +23,33 @@ public class ChatClient {
         this.serverPort = serverPort;
     }
 
-    public static void main(String[] args) throws IOException {
-        ChatClient client = new ChatClient("localhost", 8818);  // Create a new instance of the client
-        
-        client.addUserStatusListener(new UserStatusListener() {
-            @Override
-            public void online(String login) {
-                System.out.println("ONLINE: " + login);
-            }
-
-            @Override
-            public void offline(String login) {
-                System.out.println("OFFLINE: " + login);
-            }
-        });
-
-        client.addMessageListener(new MessageListener() {
-            @Override
-            public void onMessage(String fromLogin, String msgBody) {
-                System.out.println("You got a message from " + fromLogin + " ===>" + msgBody);
-            }
-        });
-
-        if(!client.connect()) {
-            System.err.println("Connect failed.");
-        }
-        else {
-            System.out.println("Connection successful.");
+//    public static void main(String[] args) throws IOException {
+//        ChatClient client = new ChatClient("localhost", 8818);  // Create a new instance of the client
+//        
+//        client.addUserStatusListener(new UserStatusListener() {
+//            @Override
+//            public void online(String login) {
+//                System.out.println("ONLINE: " + login);
+//            }
+//
+//            @Override
+//            public void offline(String login) {
+//                System.out.println("OFFLINE: " + login);
+//            }
+//        });
+//
+//        client.addMessageListener(new MessageListener() {
+//            @Override
+//            public void onMessage(String fromLogin, String msgBody) {
+//                System.out.println("You got a message from " + fromLogin + " ===>" + msgBody);
+//            }
+//        });
+//
+//        if(!client.connect()) {
+//            System.err.println("Connect failed.");
+//        }
+//        else {
+//            System.out.println("Connection successful.");
 //            String username = null;
 //            String password = null;
 //
@@ -69,8 +69,8 @@ public class ChatClient {
 //      else {
 //          System.err.println("Login Failed");
 //      }
-        }
-    }
+//        }
+//    }
 
     public void msg(String sendTo, String msgBody) throws IOException {
         String cmd = "msg " + sendTo + " " + msgBody + "\n\r";
@@ -78,7 +78,7 @@ public class ChatClient {
     }
 
     public void logoff() throws IOException {
-        String cmd = "logoff\n\r";
+        String cmd = "quit\n\r";
         serverOut.write(cmd.getBytes());
     }
 

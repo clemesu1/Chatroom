@@ -21,8 +21,10 @@ public class Main extends Application {
 			Parent root = FXMLLoader.load(getClass().getResource("/com/csa/ChatClient/Login.fxml"));
 			Scene scene = new Scene(root,400,400);
 			primaryStage.setScene(scene);
+			primaryStage.setTitle("Login to Chatroom");
+			primaryStage.setResizable(false);
 			primaryStage.show();
-			client.connect();
+			//client.connect();
 		} catch(Exception e) {
 			e.printStackTrace();
 		}

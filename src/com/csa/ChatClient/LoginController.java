@@ -1,8 +1,6 @@
 package com.csa.ChatClient;
 
 import java.io.IOException;
-import java.net.URL;
-import java.util.ResourceBundle;
 
 import com.csa.Main;
 
@@ -13,6 +11,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
+import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
@@ -31,13 +30,16 @@ public class LoginController {
     
     @FXML
     private Hyperlink btnRegister;
+    
+    @FXML
+    private Label lblMessage;
         
     private ChatClient client;
     
     public void Login(ActionEvent event) throws IOException {
     	
     	client = Main.getClient();
-    	
+    	client.connect();
 		String username = txtUsername.getText();
 		String password = txtPassword.getText();
 		
@@ -52,13 +54,16 @@ public class LoginController {
 
 			primaryStage.setScene(scene);
 			primaryStage.setResizable(false);
+			primaryStage.setTitle("Chatroom");
 			primaryStage.show();
 			
 			Stage stage = (Stage) btnLogin.getScene().getWindow();
 			stage.close();
 	    }
 	    else {
+	    	
 	    	System.err.println("Login Failed");
+	    	lblMessage.setText("Login Failed");
 	    }
 		
     }
@@ -74,6 +79,7 @@ public class LoginController {
 
 			primaryStage.setScene(scene);
 			primaryStage.setResizable(false);
+			primaryStage.setTitle("Register Account");
 			primaryStage.show();
 			
 			Stage stage = (Stage) btnLogin.getScene().getWindow();
