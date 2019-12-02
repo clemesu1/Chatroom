@@ -14,7 +14,6 @@ public class Main extends Application {
 	
 	private static ChatClient client;
 	
-	
 	@Override
 	public void start(Stage primaryStage) {
 		try {
@@ -40,5 +39,7 @@ public class Main extends Application {
 	public static void setClient(String ipAddress) {
 		client = new ChatClient(ipAddress, 8818);
 	}
+	
+	
 
 }

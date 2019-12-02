@@ -35,6 +35,7 @@ public class LoginController {
 	public void LoginUser(ActionEvent event) throws IOException {
 		
 		client = Main.getClient();
+		client.connect();
 		
 		String username = txtLoginUsername.getText();
 		String password = txtLoginPassword.getText();
@@ -56,7 +57,7 @@ public class LoginController {
 			Stage stage = (Stage) btnLoginUser.getScene().getWindow();
 			stage.close();
 			
-			client.logoff();
+			//client.closeConnection();
 	    }
 	    else {
 	    	Alert alert = new Alert(AlertType.ERROR);

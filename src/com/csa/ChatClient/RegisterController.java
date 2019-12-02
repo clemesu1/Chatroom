@@ -64,7 +64,7 @@ public class RegisterController {
         			
         			Stage stage = (Stage) btnRegisterUser.getScene().getWindow();
         			stage.close();
-        			client.logoff();
+        			//client.closeConnection();
         			
         		} catch (IOException e) {
         			e.printStackTrace();

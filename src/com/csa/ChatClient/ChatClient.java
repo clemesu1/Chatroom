@@ -98,27 +98,16 @@ public class ChatClient {
     }
 
     public boolean login(String username, String password) throws IOException {
-    		System.out.println("Test login method");
-
         String cmd = "login " + username + " " + password + "\n";
         serverOut.write(cmd.getBytes());
-        
-        
-        	System.out.println("Test login method 3");
         String response = bufferedIn.readLine();
-        	System.out.println("Test login method 4");
-
         System.out.println("Response Line: " + response);
-        	System.out.println("Test login method 5");
 
         if(("login " + username).equalsIgnoreCase(response)) {
             startMessageReader();
-        	System.out.println("Test login method 4 true");
             return true;
         }
         else {
-        	System.out.println("Test login method false 4");
-
             return false;
         }
     }
@@ -218,5 +207,9 @@ public class ChatClient {
     
     public void test() {
     	System.out.println("test");
+    }
+
+    public void closeConnection() throws IOException {
+    	socket.close();
     }
 }

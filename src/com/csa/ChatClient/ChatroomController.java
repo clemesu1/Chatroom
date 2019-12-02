@@ -41,7 +41,9 @@ public class ChatroomController {
 	
 	
 	public void Logout(ActionEvent event) {
+		
 		client = Main.getClient();
+		//client.connect();
 		
 		try {
 			client.logoff();

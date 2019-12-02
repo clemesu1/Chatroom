@@ -21,9 +21,8 @@ public class ServerWorker extends Thread {
 
     private String login = null;
     private OutputStream outputStream;
-    private FileInputStream fileInputStream;
     private HashSet<String> topicSet = new HashSet<>();
-    private HashSet<User> userSet = new HashSet<>();
+    public HashSet<User> userSet = new HashSet<>();
     
     private File database;
     private FileWriter fileWriter;
@@ -165,7 +164,9 @@ public class ServerWorker extends Thread {
 	    	if(hasFile || inUserSet) {
 	    		 String msg = "login " + username + "\n";
                  outputStream.write(msg.getBytes()); // Sends output back to the client
+                 
                  this.login = username; // Set login of this server worker to the user entered login string
+                 
                  System.out.println("User " + username + " has logged in successfully");
 
                  List<ServerWorker> workerList = server.getWorkerList();
@@ -279,8 +280,7 @@ public class ServerWorker extends Thread {
 
         outputStream.write(msg.getBytes()); // Sends output back to the client
     }
-
-    
+       
 
     private void send(String msg) throws IOException {
         if(login != null) { // Only send messages if login is not null
