@@ -3,54 +3,51 @@ package com.csa.ChatClient;
 import java.io.IOException;
 
 import com.csa.Main;
+import com.jfoenix.controls.JFXPasswordField;
+import com.jfoenix.controls.JFXTextField;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
+import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Stage;
 
 public class RegisterController {
-	
 	@FXML
-	private TextField txtUsername;
+    private JFXTextField txtRegisterUsername;
+    
+    @FXML
+    private JFXPasswordField txtRegisterPassword;
+    
+    @FXML
+    private JFXPasswordField txtConfirmPassword;
+    
+    @FXML
+    private Button btnRegisterUser;
+    	
+    @FXML
+    private Hyperlink btnLoginWindow;
+    
+    @FXML
+    private Label lblError;
+    
+    private ChatClient client;
 	
-	@FXML
-	private PasswordField txtPassword;
-	
-	@FXML
-	private PasswordField txtConfirmPassword;
-	
-	@FXML
-	private Button btnRegister;
-	
-	@FXML
-	private Hyperlink btnLogin;
-	
-	@FXML
-	private Label lblError;
-	
-	private ChatClient client;
-
-	public void Register(ActionEvent event) throws IOException {
+	public void RegisterUser(ActionEvent event) throws IOException {
 		
 		client = Main.getClient();
 		
-		String username;
-		String password;
+		String username = txtRegisterUsername.getText();
+		String password = txtRegisterPassword.getText();
 		
-		if(txtPassword.getText().equals(txtConfirmPassword.getText())) {
-			username = txtUsername.getText();	// Get text from username textfield
-			password = txtPassword.getText();	// Get text from password textfield
-						
+		if(password.equals(txtConfirmPassword.getText())) {
 			if(client.register(username, password)) {
-                System.out.println("Register Successful");
                 try {
         			FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/csa/ChatClient/Login.fxml"));
         			
@@ -61,27 +58,32 @@ public class RegisterController {
         			        			
         			primaryStage.setScene(scene);
         			primaryStage.setResizable(false);
+        			primaryStage.setTitle("Login to Chatroom");
         			primaryStage.show();
         			
-        			Stage stage = (Stage) btnLogin.getScene().getWindow();
+        			Stage stage = (Stage) btnRegisterUser.getScene().getWindow();
         			stage.close();
+        			client.logoff();
         			
         		} catch (IOException e) {
         			e.printStackTrace();
         		}
             }
             else {
-                System.err.println("Register Failed");
+            	Alert alert = new Alert(AlertType.ERROR);
+    			alert.setTitle("User Registration Error");
+    			alert.setContentText("Error with user registration.");
+    			alert.showAndWait();
             }
 		}
 		else {
-			
 			lblError.setText("Please make sure your passwords match");
 		}
 		
+
 	}
 	
-	public void Login(ActionEvent event) {
+	public void LoginWindow(ActionEvent event) {
 		try {
 			FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/csa/ChatClient/Login.fxml"));
 			
@@ -92,14 +94,14 @@ public class RegisterController {
 
 			primaryStage.setScene(scene);
 			primaryStage.setResizable(false);
+			primaryStage.setTitle("Login to Chatroom");
 			primaryStage.show();
 			
-			Stage stage = (Stage) btnLogin.getScene().getWindow();
+			Stage stage = (Stage) btnLoginWindow.getScene().getWindow();
 			stage.close();
 			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
-	 
 }

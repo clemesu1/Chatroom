@@ -23,7 +23,7 @@ public class ChatClient {
         this.serverPort = serverPort;
     }
 
-    public static void main(String[] args) throws IOException {
+    /*public static void main(String[] args) throws IOException {
         ChatClient client = new ChatClient("localhost", 8818);  // Create a new instance of the client
         
         client.addUserStatusListener(new UserStatusListener() {
@@ -70,10 +70,10 @@ public class ChatClient {
 //          System.err.println("Login Failed");
 //      }
         }
-    }
+    }*/
 
     public void msg(String sendTo, String msgBody) throws IOException {
-        String cmd = "msg " + sendTo + " " + msgBody + "\n\r";
+        String cmd = "msg " + sendTo + " " + msgBody + "\n";
         serverOut.write(cmd.getBytes());
     }
 
@@ -83,12 +83,12 @@ public class ChatClient {
     }
 
     public boolean register(String username, String password) throws IOException {
-        String cmd = "register " + username + " " + password + "\n\r";
+        String cmd = "register " + username + " " + password + "\n";
         serverOut.write(cmd.getBytes());
         String response = bufferedIn.readLine();
         System.out.println("Register Response Line: " + response);
 
-        if(("User " + username + " registered").equals(response)) {
+        if((username + " registered").equals(response)) {
             return true;
         }
         else {
@@ -98,18 +98,27 @@ public class ChatClient {
     }
 
     public boolean login(String username, String password) throws IOException {
-        String cmd = "login " + username + " " + password + "\n\r";
+    		System.out.println("Test login method");
+
+        String cmd = "login " + username + " " + password + "\n";
         serverOut.write(cmd.getBytes());
-
-        bufferedIn.readLine();
+        
+        
+        	System.out.println("Test login method 3");
         String response = bufferedIn.readLine();
-        System.out.println("Response Line: " + response);
+        	System.out.println("Test login method 4");
 
-        if((username + " logged in").equalsIgnoreCase(response)) {
+        System.out.println("Response Line: " + response);
+        	System.out.println("Test login method 5");
+
+        if(("login " + username).equalsIgnoreCase(response)) {
             startMessageReader();
+        	System.out.println("Test login method 4 true");
             return true;
         }
         else {
+        	System.out.println("Test login method false 4");
+
             return false;
         }
     }

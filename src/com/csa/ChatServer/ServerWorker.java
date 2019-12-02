@@ -1,12 +1,18 @@
 package com.csa.ChatServer;
 
-import org.apache.commons.lang3.StringUtils;
-
-import java.io.*;
-
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.Socket;
 import java.util.HashSet;
 import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
 
 public class ServerWorker extends Thread {
 
@@ -17,11 +23,16 @@ public class ServerWorker extends Thread {
     private OutputStream outputStream;
     private HashSet<String> topicSet = new HashSet<>();
     private HashSet<User> userSet = new HashSet<>();
+    
+    private File database;
+    private FileWriter fileWriter;
+    private BufferedReader fileReader;
 
 
-    public ServerWorker(Server server, Socket clientSocket) {
+    public ServerWorker(Server server, Socket clientSocket) throws IOException {
         this.server = server;
         this.clientSocket = clientSocket;
+        
     }
 
     @Override
@@ -74,7 +85,7 @@ public class ServerWorker extends Thread {
                     handleLeave(tokens);
                 }
                 else {
-                    String msg = "Unknown command: " + cmd + "\n\r";
+                    String msg = "Unknown command: " + cmd + "\n";
                     outputStream.write(msg.getBytes()); // Sends output back to the client
                 }
             }
@@ -94,12 +105,96 @@ public class ServerWorker extends Thread {
         if(tokens.length == 3) {
             String username = tokens[1];
             String password = tokens[2];
+            
+            String fileName = "\\" + username + ".log";
+            String directory = "C:\\Users\\coliw\\Documents\\Chatroom\\src\\com\\csa\\ChatServer\\database";
+            String fileLocation = directory + fileName;
+            
+            
+            database = new File(fileLocation);
+            		
+            fileWriter = new FileWriter(database, true);
+            fileWriter.write(password);
+            fileWriter.close();
+            
             User user = new User(username, password);
             userSet.add(user);
-            String msg = "User " + username + " registered\n\r";
+            
+            String msg = username + " registered\n";
             outputStream.write(msg.getBytes());
             System.out.println("User " + username + " has registered successfully");
         }
+    }
+    
+    private void handleLogin(OutputStream outputStream, String[] tokens) throws IOException {
+    	boolean hasFile = false;
+    	boolean inUserSet = false;
+    	
+    	if(tokens.length == 3) {
+    		String username = tokens[1];
+            String password = tokens[2];
+            
+            
+            database = new File("C:\\Users\\coliw\\Documents\\Chatroom\\src\\com\\csa\\ChatServer\\database");
+
+            String fileCheck = username + ".log";
+            
+	    	File[] directory = database.listFiles();
+	    	for(File file : directory) {
+	    		if(file.isFile()) {
+	    			if(fileCheck.equals(file.getName())) {
+	    				fileReader = new BufferedReader(new FileReader(file));
+	    				String passwordCheck = fileReader.readLine();
+	    				fileReader.close();
+	    				if(passwordCheck.equals(password)) {
+	    					hasFile = true;
+	    					break;
+	    				}
+	    			}
+	    		}
+	    	}
+	    	
+	    	for(User user : userSet) {
+	    		if(user.getUsername().equals(login) && user.getPassword().equals(password)) {
+	    			inUserSet = true;
+	    			break;
+	    		}
+	    	}
+	    	
+	    	if(hasFile || inUserSet) {
+	    		 String msg = "login " + username + "\n";
+                 outputStream.write(msg.getBytes()); // Sends output back to the client
+                 this.login = username; // Set login of this server worker to the user entered login string
+                 System.out.println("User " + username + " has logged in successfully");
+
+                 List<ServerWorker> workerList = server.getWorkerList();
+
+                 // Send the current user all other online user's username's
+                 for(ServerWorker worker : workerList) {
+                     if(!username.equals(worker.getLogin())) {  // Stops it from sending yourself your own online status
+                         if(worker.getLogin() != null) {
+                             String localMsg = "online " + worker.getLogin() + "\n";
+                             send(localMsg);
+                         }
+                     }
+                 }
+
+                 // Send other online users current user's online status
+                 String onlineMsg = username + " is online\n";
+                 for(ServerWorker worker : workerList) {
+                     if(!username.equals(worker.getLogin())) {  // Stops it from sending yourself your own online status
+                         worker.send(onlineMsg);
+                     }
+                 }
+                 
+             }
+             else {
+                 String msg = "Login Error\n";
+                 outputStream.write(msg.getBytes()); // Sends output back to the client
+                 System.err.println("Login failed for " + username);
+             }
+    	}
+  
     }
 
     public boolean isMemberOfTopic(String topic) {
@@ -136,25 +231,27 @@ public class ServerWorker extends Thread {
             if(isTopic) {   // if message is meant for a topic
                 if(worker.isMemberOfTopic(sendTo)) {
                     //String outMsg = "msg " + login + " " + body + "\n\r";
-                    String outMsg = "(" + sendTo + ") " + login + "> " + body + "\n\r";
+                    String outMsg = "(" + sendTo + ") " + login + "> " + body + "\n";
                     worker.send(outMsg);
                 }
             }
             else {  // probably meant for a user
                 if (sendTo.equalsIgnoreCase(worker.getLogin())) {
                     //String outMsg = "msg " + login + " " + body + "\n\r";
-                    String outMsg = login + "> " + body + "\n\r";
+                    String outMsg = login + "> " + body + "\n";
                     worker.send(outMsg);
                 }
             }
         }
     }
+    
+    
 
     private void handleLogOff() throws IOException {
         server.removeWorker(this);
         List<ServerWorker> workerList = server.getWorkerList();
 
-        String offlineMsg = "offline " + login + "\n\r";
+        String offlineMsg = "offline " + login + "\n";
         for(ServerWorker worker : workerList) {
             if(!login.equals(worker.getLogin())) {  // Stops it from sending yourself your own online status
                 worker.send(offlineMsg);
@@ -168,7 +265,7 @@ public class ServerWorker extends Thread {
     }
 
     private void handleHelp(OutputStream outputStream) throws IOException { // Help class for list of commands
-        String msg = "List of Commands:\n\r";
+        String msg = "List of Commands:\n";
         msg += "register <USERNAME> <PASSWORD>\n\r";   // register command
         msg += "login <USERNAME> <PASSWORD>\n\r";   // login command
         msg += "msg <USERNAME> <MESSAGE>\n\r";  // direct messaging command
@@ -182,45 +279,7 @@ public class ServerWorker extends Thread {
         outputStream.write(msg.getBytes()); // Sends output back to the client
     }
 
-    private void handleLogin(OutputStream outputStream, String[] tokens) throws IOException {
-        if(tokens.length == 3) {
-            String login = tokens[1];
-            String password = tokens[2];
-            for(User user : userSet) {
-                if(user.getUsername().equals(login) && user.getPassword().equals(password)) {
-                    String msg = login + " logged in\n\r";
-                    outputStream.write(msg.getBytes()); // Sends output back to the client
-                    this.login = login; // Set login of this server worker to the user entered login string
-                    System.out.println("User " + login + " has logged in successfully");
-
-                    List<ServerWorker> workerList = server.getWorkerList();
-
-                    // Send the current user all other online user's username's
-                    for(ServerWorker worker : workerList) {
-                        if(!login.equals(worker.getLogin())) {  // Stops it from sending yourself your own online status
-                            if(worker.getLogin() != null) {
-                                String localMsg = "online " + worker.getLogin() + "\n\r";
-                                send(localMsg);
-                            }
-                        }
-                    }
-
-                    // Send other online users current user's online status
-                    String onlineMsg = login + " is online\n\r";
-                    for(ServerWorker worker : workerList) {
-                        if(!login.equals(worker.getLogin())) {  // Stops it from sending yourself your own online status
-                            worker.send(onlineMsg);
-                        }
-                    }
-                }
-                else {
-                    String msg = "Login Error\n\r";
-                    outputStream.write(msg.getBytes()); // Sends output back to the client
-                    System.err.println("Login failed for " + login);
-                }
-            }
-        }
-    }
+    
 
     private void send(String msg) throws IOException {
         if(login != null) { // Only send messages if login is not null

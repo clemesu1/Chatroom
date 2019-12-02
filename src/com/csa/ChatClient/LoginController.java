@@ -1,48 +1,45 @@
 package com.csa.ChatClient;
 
 import java.io.IOException;
-import java.net.URL;
-import java.util.ResourceBundle;
 
 import com.csa.Main;
+import com.jfoenix.controls.JFXPasswordField;
+import com.jfoenix.controls.JFXTextField;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
+import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Stage;
 
 public class LoginController {
-    //ChatClient client = new ChatClient("localhost", 8818);  // Create a new instance of the client
-
-    @FXML
-    private TextField txtUsername;
+	@FXML
+    private JFXTextField txtLoginUsername;
     
     @FXML
-    private PasswordField txtPassword;
+    private JFXPasswordField txtLoginPassword;
     
     @FXML
-    private Button btnLogin;
+    private Button btnLoginUser;
     
     @FXML
-    private Hyperlink btnRegister;
-        
+    private Hyperlink btnRegisterWindow;
+    
     private ChatClient client;
     
-    public void Login(ActionEvent event) throws IOException {
-    	
-    	client = Main.getClient();
-    	
-		String username = txtUsername.getText();
-		String password = txtPassword.getText();
+	public void LoginUser(ActionEvent event) throws IOException {
+		
+		client = Main.getClient();
+		
+		String username = txtLoginUsername.getText();
+		String password = txtLoginPassword.getText();
 		
 		if(client.login(username, password)) {
-			System.out.println("Login Successful");
 			FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/csa/ChatClient/Chatroom.fxml"));
 			
 			Parent root = loader.load();
@@ -51,37 +48,41 @@ public class LoginController {
 			Stage primaryStage = new Stage();
 
 			primaryStage.setScene(scene);
+			primaryStage.setTitle("Chatroom");
 			primaryStage.setResizable(false);
 			primaryStage.show();
 			
-			Stage stage = (Stage) btnLogin.getScene().getWindow();
+			Stage stage = (Stage) btnLoginUser.getScene().getWindow();
 			stage.close();
+			
+			client.logoff();
 	    }
 	    else {
-	    	System.err.println("Login Failed");
+	    	Alert alert = new Alert(AlertType.ERROR);
+			alert.setTitle("Login Error");
+			alert.setContentText("Error with user login.");
+			alert.showAndWait();
 	    }
-		
-    }
-    
-    public void Register(ActionEvent event) {
-    	try {
+	}
+	
+	public void RegisterWindow(ActionEvent event) {
+		try {
 			FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/csa/ChatClient/Register.fxml"));
 			
 			Parent root = loader.load();
 			
 			Scene scene = new Scene(root,400,400);
 			Stage primaryStage = new Stage();
-
+			        			
 			primaryStage.setScene(scene);
 			primaryStage.setResizable(false);
 			primaryStage.show();
 			
-			Stage stage = (Stage) btnLogin.getScene().getWindow();
+			Stage stage = (Stage) btnLoginUser.getScene().getWindow();
 			stage.close();
 			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-    }
-
+	}
 }
