@@ -21,6 +21,7 @@ public class ServerWorker extends Thread {
 
     private String login = null;
     private OutputStream outputStream;
+    private FileInputStream fileInputStream;
     private HashSet<String> topicSet = new HashSet<>();
     private HashSet<User> userSet = new HashSet<>();
     

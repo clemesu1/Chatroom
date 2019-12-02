@@ -50,6 +50,7 @@ public class LoginController {
 			primaryStage.setScene(scene);
 			primaryStage.setTitle("Chatroom");
 			primaryStage.setResizable(false);
+			primaryStage.setTitle("Chatroom");
 			primaryStage.show();
 			
 			Stage stage = (Stage) btnLoginUser.getScene().getWindow();
@@ -76,6 +77,7 @@ public class LoginController {
 			        			
 			primaryStage.setScene(scene);
 			primaryStage.setResizable(false);
+			primaryStage.setTitle("Register Account");
 			primaryStage.show();
 			
 			Stage stage = (Stage) btnLoginUser.getScene().getWindow();

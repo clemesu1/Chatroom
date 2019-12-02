@@ -78,7 +78,7 @@ public class ChatClient {
     }
 
     public void logoff() throws IOException {
-        String cmd = "logoff\n\r";
+        String cmd = "quit\n\r";
         serverOut.write(cmd.getBytes());
     }
 

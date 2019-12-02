@@ -40,24 +40,25 @@ public class ChatroomController {
 	private ChatClient client;
 	
 	
-	public void Logout(ActionEvent event) throws IOException {
-		this.client = Main.getClient();
+	public void Logout(ActionEvent event) {
+		client = Main.getClient();
 		
 		try {
 			client.logoff();
+
+			FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/csa/ChatClient/Login.fxml"));
 			
-//			FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/csa/ChatClient/Login.fxml"));
-//			
-//			Parent root = loader.load();
-//			
-//			Scene scene = new Scene(root,400,400);
-//			Stage primaryStage = new Stage();
-//
-//			primaryStage.setScene(scene);
-//			primaryStage.setResizable(false);
-//			primaryStage.show();
+			Parent root = loader.load();
 			
-			Stage stage = (Stage) btnLogout.getScene().getWindow();
+			Scene scene = new Scene(root,400,400);
+			Stage primaryStage = new Stage();
+
+			primaryStage.setScene(scene);
+			primaryStage.setResizable(false);
+			primaryStage.setTitle("Login to Chatroom");
+			primaryStage.show();
+			
+			Stage stage = (Stage) btnSend.getScene().getWindow();
 			stage.close();
 			
 		} catch (IOException e) {

@@ -42,6 +42,7 @@ public class RegisterController {
 	public void RegisterUser(ActionEvent event) throws IOException {
 		
 		client = Main.getClient();
+		client.connect();
 		
 		String username = txtRegisterUsername.getText();
 		String password = txtRegisterPassword.getText();
