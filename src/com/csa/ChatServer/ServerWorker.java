@@ -22,7 +22,8 @@ public class ServerWorker extends Thread {
     private String login = null;
     private OutputStream outputStream;
     private HashSet<String> topicSet = new HashSet<>();
-    public HashSet<User> userSet = new HashSet<>();
+    public static HashSet<User> userSet = new HashSet<>();
+    public static HashSet<String> nameSet = new HashSet<>();
     
     private File database;
     private FileWriter fileWriter;
@@ -75,7 +76,7 @@ public class ServerWorker extends Thread {
                     handleLogin(outputStream, tokens);
                 }
                 else if("msg".equalsIgnoreCase(cmd)) {
-                    String[] tokensMsg = StringUtils.split(line, null, 3);
+                    String[] tokensMsg = StringUtils.split(line, null, 2);
                     handleMessage(tokensMsg);
                 }
                 else if("join".equalsIgnoreCase(cmd)) {
@@ -107,9 +108,8 @@ public class ServerWorker extends Thread {
             String password = tokens[2];
             
             String fileName = "\\" + username + ".log";
-            String directory = "C:\\Users\\coliw\\Documents\\Chatroom\\src\\com\\csa\\ChatServer\\database";
+            String directory = "C:\\Users\\coliw\\OneDrive\\Documents\\GitHub\\Chatroom\\src\\com\\csa\\ChatServer\\database";
             String fileLocation = directory + fileName;
-            
             
             database = new File(fileLocation);
             		
@@ -135,7 +135,7 @@ public class ServerWorker extends Thread {
             String password = tokens[2];
             
             
-            database = new File("C:\\Users\\coliw\\Documents\\Chatroom\\src\\com\\csa\\ChatServer\\database");
+            database = new File("C:\\Users\\coliw\\OneDrive\\Documents\\GitHub\\Chatroom\\src\\com\\csa\\ChatServer\\database\\");
 
             String fileCheck = username + ".log";
             
@@ -198,16 +198,24 @@ public class ServerWorker extends Thread {
     	}
   
     }
+    
+    private void handleMessage(String[] tokens) throws IOException {
+        
+        List<ServerWorker> workerList = server.getWorkerList();
+        
+        String msgBody = tokens[1];
+        
+        for(ServerWorker worker : workerList) {
+        	if(!login.equals(worker.getLogin())) {
+        		String outMsg = "msg " + login + " " + msgBody + "\n";
+            	worker.send(outMsg);
+        	}
+        }
+    }
 
     public boolean isMemberOfTopic(String topic) {
         return topicSet.contains(topic);
     }
-
-    // maybe use this data type for storing registered users
-    // register <USERNAME> <PASSWORD>
-    // adds users to hash set userSet
-    // if user tries to do command and isn't logged in print error
-    // check if user is in set before doing anything
 
 
     // maybe have users automatically join general message group and message in that group
@@ -221,31 +229,7 @@ public class ServerWorker extends Thread {
 
     // format: msg <USERNAME> <MESSAGE>
     // format: msg #<TOPIC> <MESSAGE>
-    private void handleMessage(String[] tokens) throws IOException {
-        String sendTo = tokens[1];
-        String body = tokens[2];
 
-        boolean isTopic = sendTo.charAt(0) == '#';
-
-        List<ServerWorker> workerList = server.getWorkerList();
-
-        for(ServerWorker worker : workerList) {
-            if(isTopic) {   // if message is meant for a topic
-                if(worker.isMemberOfTopic(sendTo)) {
-                    //String outMsg = "msg " + login + " " + body + "\n\r";
-                    String outMsg = "(" + sendTo + ") " + login + "> " + body + "\n";
-                    worker.send(outMsg);
-                }
-            }
-            else {  // probably meant for a user
-                if (sendTo.equalsIgnoreCase(worker.getLogin())) {
-                    //String outMsg = "msg " + login + " " + body + "\n\r";
-                    String outMsg = login + "> " + body + "\n";
-                    worker.send(outMsg);
-                }
-            }
-        }
-    }
     
     
 
@@ -270,7 +254,7 @@ public class ServerWorker extends Thread {
         String msg = "List of Commands:\n";
         msg += "register <USERNAME> <PASSWORD>\n\r";   // register command
         msg += "login <USERNAME> <PASSWORD>\n\r";   // login command
-        msg += "msg <USERNAME> <MESSAGE>\n\r";  // direct messaging command
+        msg += "msg <MESSAGE>\n\r";  // direct messaging command
         msg += "join #<TOPIC>\n\r";    // join group command
         msg += "leave #<TOPIC>\n\r";    // leave group command
         msg += "msg #<TOPIC> <MESSAGE>\n\r";    // group messaging command
@@ -286,5 +270,12 @@ public class ServerWorker extends Thread {
         if(login != null) { // Only send messages if login is not null
             outputStream.write(msg.getBytes());
         }
+    }
+    
+    public static HashSet<String> getNameSet() {
+    	for(User user : userSet) {
+    		nameSet.add(user.getUsername());
+    	}
+    	return nameSet;
     }
 }

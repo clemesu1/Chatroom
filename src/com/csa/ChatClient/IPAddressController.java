@@ -16,11 +16,10 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Stage;
 
 public class IPAddressController {
-public String ipAddress;
+	public String ipAddress;
 	
 	public ChatClient client;
 
-	/* IP ADDRESS WINDOW */
 	@FXML
 	private JFXTextField txtIPAddress;
 	
@@ -41,22 +40,41 @@ public String ipAddress;
 			
 		Main.setClient(ipAddress);
 		ChatClient client = Main.getClient();
+		
+		client.addUserStatusListener(new UserStatusListener() {
+            @Override
+            public void online(String login) {
+                System.out.println("ONLINE: " + login);
+            }
+
+            @Override
+            public void offline(String login) {
+                System.out.println("OFFLINE: " + login);
+            }
+        });
+
+        client.addMessageListener(new MessageListener() {
+            @Override
+            public void onMessage(String fromLogin, String msgBody) {
+                System.out.println("You got a message from " + fromLogin + " ===>" + msgBody);
+            }
+        });
 			
-			if(client.connect()) {
-				try {
-					FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/csa/ChatClient/Login.fxml"));
-					Parent root = loader.load();
-					Scene scene = new Scene(root,400,400);
-					Stage primaryStage = new Stage();
-					        			
-					primaryStage.setScene(scene);
-					primaryStage.setResizable(false);
-					primaryStage.setTitle("Login to Chatroom");
-					primaryStage.show();
-					
-					Stage stage = (Stage) btnContinue.getScene().getWindow();
-					stage.close();
-					
+		if(client.connect()) {
+			try {
+				FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/csa/ChatClient/Login.fxml"));
+				Parent root = loader.load();
+				Scene scene = new Scene(root,400,400);
+				Stage primaryStage = new Stage();
+				        			
+				primaryStage.setScene(scene);
+				primaryStage.setResizable(false);
+				primaryStage.setTitle("Login to Chatroom");
+				primaryStage.show();
+				
+				Stage stage = (Stage) btnContinue.getScene().getWindow();
+				stage.close();
+				
 				} catch (IOException e) {
 					e.printStackTrace();
 				}

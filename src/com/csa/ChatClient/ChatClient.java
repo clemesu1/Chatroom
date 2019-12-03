@@ -72,8 +72,8 @@ public class ChatClient {
         }
     }*/
 
-    public void msg(String sendTo, String msgBody) throws IOException {
-        String cmd = "msg " + sendTo + " " + msgBody + "\n";
+    public void msg(String msgBody) throws IOException {
+        String cmd = "msg " + msgBody + "\n";
         serverOut.write(cmd.getBytes());
     }
 
@@ -203,10 +203,6 @@ public class ChatClient {
     }
     public void removeMessageListener(MessageListener listener) {
         messageListeners.remove(listener);
-    }
-    
-    public void test() {
-    	System.out.println("test");
     }
 
     public void closeConnection() throws IOException {

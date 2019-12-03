@@ -41,6 +41,8 @@ public class LoginController {
 		String password = txtLoginPassword.getText();
 		
 		if(client.login(username, password)) {
+			
+			Main.setUsername(username);
 			FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/csa/ChatClient/Chatroom.fxml"));
 			
 			Parent root = loader.load();

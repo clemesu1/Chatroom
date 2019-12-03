@@ -1,12 +1,17 @@
 package com.csa.ChatClient;
 
 import java.io.IOException;
+import java.net.URL;
+import java.util.HashSet;
+import java.util.ResourceBundle;
 
 import com.csa.Main;
+import com.csa.ChatServer.ServerWorker;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -17,7 +22,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
-public class ChatroomController {
+public class ChatroomController implements Initializable, UserStatusListener, MessageListener	{
 	@FXML
 	private Label lblWelcome;
 	
@@ -27,22 +32,21 @@ public class ChatroomController {
 	@FXML
 	private TextField txtMessageField;
 	
-	@FXML
+	@FXML	
 	private Button btnSend;
 	
 	@FXML
-	private ListView<String> lstUserList;
+	private ListView<String> lstUserList = new ListView<>();
 	
 	@FXML
 	private Hyperlink btnLogout;
 	
     
 	private ChatClient client;
-	
+		
 	
 	public void Logout(ActionEvent event) {
 		
-		client = Main.getClient();
 		//client.connect();
 		
 		try {
@@ -70,5 +74,49 @@ public class ChatroomController {
 	
 	public void sendMessage(ActionEvent event) {
 		
+		try {
+			String message = txtMessageField.getText();			
+			client.msg(message);
+			txtChatArea.appendText(Main.getUsername() + ": " + message + "\n");
+			txtMessageField.setText("");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
+
+	@Override
+	public void online(String login) {
+		txtChatArea.appendText(login + " is online\n");
+		lstUserList.getItems().add(login);
+		//lstUserList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+	}
+
+	@Override
+	public void offline(String login) {
+		txtChatArea.appendText(login + " is offline\n");
+		lstUserList.getItems().remove(login);
+		//lstUserList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+	}
+
+	@Override
+	public void onMessage(String fromLogin, String msgBody) {
+		String line = fromLogin + " " + msgBody;
+		txtChatArea.appendText(line + "\n");
+		
+	}
+
+	@Override
+	public void initialize(URL arg0, ResourceBundle arg1) {
+		lblWelcome.setText("Welcome " + Main.getUsername() + "!");
+		
+		HashSet<String> nameSet = ServerWorker.getNameSet();
+		lstUserList.getItems().addAll(nameSet);	
+		
+		client = Main.getClient();
+		
+		client.addUserStatusListener(this);
+		client.addMessageListener(this);
+		
+	}
+
 }
