@@ -31,7 +31,7 @@ public class ServerWorker extends Thread {
     private File database;
     private FileWriter fileWriter;
     private BufferedReader fileReader;
-    
+        
     private Crypto crypto = new PasswordEncryption();	
 
     public ServerWorker(Server server, Socket clientSocket) throws IOException {

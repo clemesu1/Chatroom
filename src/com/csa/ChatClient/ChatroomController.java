@@ -1,5 +1,7 @@
 package com.csa.ChatClient;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.Timestamp;
@@ -16,13 +18,13 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Stage;
 
 public class ChatroomController implements Initializable, UserStatusListener, MessageListener {
@@ -46,7 +48,9 @@ public class ChatroomController implements Initializable, UserStatusListener, Me
 	
     
 	private ChatClient client;
-		
+	
+	private File chatlog = new File("C:\\Users\\coliw\\OneDrive\\Documents\\GitHub\\Chatroom\\src\\com\\csa\\ChatServer\\database\\chatroom.log");
+	private FileWriter fileWriter;	
 	
 	public void Logout(ActionEvent event) {
 		
@@ -84,7 +88,11 @@ public class ChatroomController implements Initializable, UserStatusListener, Me
 			
 			if(!message.isEmpty()) {
 				client.msg(message);
-				txtChatArea.appendText(timeStamp + " " + Main.getUsername() + ": " + message + "\n");
+				String chatMessage = timeStamp + " " + Main.getUsername() + ": " + message + "\n";
+				txtChatArea.appendText(chatMessage);
+				fileWriter = new FileWriter(chatlog, true);
+				fileWriter.write(chatMessage);
+				fileWriter.close();
 				txtMessageField.setText("");
 			}
 			else {
@@ -103,7 +111,16 @@ public class ChatroomController implements Initializable, UserStatusListener, Me
 		String timeStamp = new Timestamp(System.currentTimeMillis()).toString();
         timeStamp = timeStamp.substring(0, timeStamp.length() - 4);	
         timeStamp = "[" + timeStamp + "]";
-		txtChatArea.appendText(timeStamp + " " + login + " is online\n");
+		String chatMessage = timeStamp + " " + login + " is online\n";
+		txtChatArea.appendText(chatMessage);
+		try {
+			fileWriter = new FileWriter(chatlog, true);
+			fileWriter.write(chatMessage);
+			fileWriter.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
 		lstUserList.getItems().add(login);
 	}
 
@@ -112,7 +129,15 @@ public class ChatroomController implements Initializable, UserStatusListener, Me
 		String timeStamp = new Timestamp(System.currentTimeMillis()).toString();
         timeStamp = timeStamp.substring(0, timeStamp.length() - 4);	
         timeStamp = "[" + timeStamp + "]";
-		txtChatArea.appendText(timeStamp + " " + login + " is offline\n");
+        String chatMessage = timeStamp + " " + login + " is offline\n";
+		txtChatArea.appendText(chatMessage);
+		try {
+			fileWriter = new FileWriter(chatlog, true);
+			fileWriter.write(chatMessage);
+			fileWriter.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		lstUserList.getItems().remove(login);
 	}
 
