@@ -23,8 +23,8 @@ public class Server extends Thread {
     @Override
     public void run() {
         try {
-            //ServerSocket serverSocket = new ServerSocket(port, 50, ip);
-            ServerSocket serverSocket = new ServerSocket(serverPort); // Sets up a server socket listening on port 8818
+            @SuppressWarnings("resource")
+			ServerSocket serverSocket = new ServerSocket(serverPort); // Sets up a server socket listening on port 8818
             while(true) {   // Continuously accept connections from the client
                 System.out.println("Waiting to accept client connections...");
                 Socket clientSocket; // Represents the connection to the client

@@ -13,7 +13,7 @@ public class ChatClient {
     private Socket socket;
     private OutputStream serverOut;
     private InputStream serverIn;
-    private static BufferedReader bufferedIn;
+    private BufferedReader bufferedIn;
 
     private ArrayList<UserStatusListener> userStatusListeners = new ArrayList<>();
     private ArrayList<MessageListener> messageListeners = new ArrayList<>();

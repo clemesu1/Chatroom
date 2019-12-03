@@ -2,6 +2,7 @@ package com.csa.ChatClient;
 
 import java.io.IOException;
 import java.net.URL;
+import java.sql.Timestamp;
 import java.util.HashSet;
 import java.util.ResourceBundle;
 
@@ -22,7 +23,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
-public class ChatroomController implements Initializable, UserStatusListener, MessageListener	{
+public class ChatroomController implements Initializable, UserStatusListener, MessageListener {
 	@FXML
 	private Label lblWelcome;
 	
@@ -75,9 +76,12 @@ public class ChatroomController implements Initializable, UserStatusListener, Me
 	public void sendMessage(ActionEvent event) {
 		
 		try {
+			String timeStamp = new Timestamp(System.currentTimeMillis()).toString();
+	        timeStamp = timeStamp.substring(0, timeStamp.length() - 4);	
+	        timeStamp = "[" + timeStamp + "]";
 			String message = txtMessageField.getText();			
 			client.msg(message);
-			txtChatArea.appendText(Main.getUsername() + ": " + message + "\n");
+			txtChatArea.appendText(timeStamp + " " + Main.getUsername() + ": " + message + "\n");
 			txtMessageField.setText("");
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -86,14 +90,20 @@ public class ChatroomController implements Initializable, UserStatusListener, Me
 
 	@Override
 	public void online(String login) {
-		txtChatArea.appendText(login + " is online\n");
+		String timeStamp = new Timestamp(System.currentTimeMillis()).toString();
+        timeStamp = timeStamp.substring(0, timeStamp.length() - 4);	
+        timeStamp = "[" + timeStamp + "]";
+		txtChatArea.appendText(timeStamp + " " + login + " is online\n");
 		lstUserList.getItems().add(login);
 		//lstUserList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 	}
 
 	@Override
 	public void offline(String login) {
-		txtChatArea.appendText(login + " is offline\n");
+		String timeStamp = new Timestamp(System.currentTimeMillis()).toString();
+        timeStamp = timeStamp.substring(0, timeStamp.length() - 4);	
+        timeStamp = "[" + timeStamp + "]";
+		txtChatArea.appendText(timeStamp + " " + login + " is offline\n");
 		lstUserList.getItems().remove(login);
 		//lstUserList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 	}
@@ -101,7 +111,10 @@ public class ChatroomController implements Initializable, UserStatusListener, Me
 	@Override
 	public void onMessage(String fromLogin, String msgBody) {
 		String line = fromLogin + " " + msgBody;
-		txtChatArea.appendText(line + "\n");
+		String timeStamp = new Timestamp(System.currentTimeMillis()).toString();
+        timeStamp = timeStamp.substring(0, timeStamp.length() - 4);	
+        timeStamp = "[" + timeStamp + "]";
+		txtChatArea.appendText(timeStamp + " " + line + "\n");
 		
 	}
 
