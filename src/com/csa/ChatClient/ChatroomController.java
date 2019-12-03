@@ -110,10 +110,10 @@ public class ChatroomController implements Initializable, UserStatusListener, Me
 
 	@Override
 	public void onMessage(String fromLogin, String msgBody) {
-		String line = fromLogin + ": " + msgBody;
 		String timeStamp = new Timestamp(System.currentTimeMillis()).toString();
         timeStamp = timeStamp.substring(0, timeStamp.length() - 4);	
         timeStamp = "[" + timeStamp + "]";
+		String line = fromLogin + ": " + msgBody;
 		txtChatArea.appendText(timeStamp + " " + line + "\n");
 		
 	}
