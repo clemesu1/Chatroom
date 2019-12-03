@@ -24,7 +24,7 @@ public class ServerWorker extends Thread {
 
     private String login = null;
     private OutputStream outputStream;
-    private HashSet<String> topicSet = new HashSet<>();
+    
     public static HashSet<User> userSet = new HashSet<>();
     public static HashSet<String> nameSet = new HashSet<>();
     
@@ -33,7 +33,6 @@ public class ServerWorker extends Thread {
     private BufferedReader fileReader;
     
     private Crypto crypto = new PasswordEncryption();	
-
 
     public ServerWorker(Server server, Socket clientSocket) throws IOException {
         this.server = server;
@@ -57,9 +56,6 @@ public class ServerWorker extends Thread {
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream)); // Reads input line-by-line
 
-        //String help = "Type help for a list of commands\n\r";
-        //outputStream.write(help.getBytes());
-
         String line;
         while((line = reader.readLine()) != null) {
             String[] tokens = StringUtils.split(line);  // Split line into tokens
@@ -71,9 +67,6 @@ public class ServerWorker extends Thread {
                     handleLogOff();
                     break;
                 }
-                else if("help".equalsIgnoreCase(cmd)) {
-                    handleHelp(outputStream);
-                }
                 else if("register".equalsIgnoreCase(cmd)) {
                     handleRegister(tokens, outputStream);
                 }
@@ -84,12 +77,6 @@ public class ServerWorker extends Thread {
                     String[] tokensMsg = StringUtils.split(line, null, 2);
                     handleMessage(tokensMsg);
                 }
-                else if("join".equalsIgnoreCase(cmd)) {
-                    handleJoin(tokens);
-                }
-                else if("leave".equalsIgnoreCase(cmd)) {
-                    handleLeave(tokens);
-                }
                 else {
                     String msg = "Unknown command: " + cmd + "\n";
                     outputStream.write(msg.getBytes()); // Sends output back to the client
@@ -98,13 +85,6 @@ public class ServerWorker extends Thread {
         }
 
         clientSocket.close();
-    }
-
-    private void handleLeave(String[] tokens) {
-        if(tokens.length > 1) {
-            String topic = tokens[2];
-            topicSet.remove(topic);
-        }
     }
 
     private void handleRegister(String[] tokens, OutputStream outputStream) throws IOException {
@@ -222,26 +202,6 @@ public class ServerWorker extends Thread {
         }
     }
 
-    public boolean isMemberOfTopic(String topic) {
-        return topicSet.contains(topic);
-    }
-
-
-    // maybe have users automatically join general message group and message in that group
-    private void handleJoin(String[] tokens) {
-        // Store the membership of the user to a topic
-        if(tokens.length > 1) {
-            String topic = tokens[2];
-            topicSet.add(topic);
-        }
-    }
-
-    // format: msg <USERNAME> <MESSAGE>
-    // format: msg #<TOPIC> <MESSAGE>
-
-    
-    
-
     private void handleLogOff() throws IOException {
         server.removeWorker(this);
         List<ServerWorker> workerList = server.getWorkerList();
@@ -258,22 +218,6 @@ public class ServerWorker extends Thread {
     public String getLogin() {
         return login;
     }
-
-    private void handleHelp(OutputStream outputStream) throws IOException { // Help class for list of commands
-        String msg = "List of Commands:\n";
-        msg += "register <USERNAME> <PASSWORD>\n\r";   // register command
-        msg += "login <USERNAME> <PASSWORD>\n\r";   // login command
-        msg += "msg <MESSAGE>\n\r";  // direct messaging command
-        msg += "join #<TOPIC>\n\r";    // join group command
-        msg += "leave #<TOPIC>\n\r";    // leave group command
-        msg += "msg #<TOPIC> <MESSAGE>\n\r";    // group messaging command
-        msg += "logoff\n\r";    // logoff command
-        msg += "quit\n\r";      // quit command
-
-
-        outputStream.write(msg.getBytes()); // Sends output back to the client
-    }
-       
 
     private void send(String msg) throws IOException {
         if(login != null) { // Only send messages if login is not null

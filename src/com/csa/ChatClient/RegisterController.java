@@ -80,8 +80,6 @@ public class RegisterController {
 		else {
 			lblError.setText("Please make sure your passwords match");
 		}
-		
-
 	}
 	
 	public void LoginWindow(ActionEvent event) {

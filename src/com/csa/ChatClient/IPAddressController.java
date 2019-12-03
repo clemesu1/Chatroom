@@ -56,7 +56,7 @@ public class IPAddressController {
         client.addMessageListener(new MessageListener() {
             @Override
             public void onMessage(String fromLogin, String msgBody) {
-                System.out.println("You got a message from " + fromLogin + " ===>" + msgBody);
+                System.out.println("You got a message from " + fromLogin + " ===> " + msgBody);
             }
         });
 			
@@ -78,7 +78,6 @@ public class IPAddressController {
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-				
 			} 
 			else {
 				Alert alert = new Alert(AlertType.ERROR);

@@ -15,12 +15,14 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Stage;
 
 public class ChatroomController implements Initializable, UserStatusListener, MessageListener {
@@ -47,8 +49,6 @@ public class ChatroomController implements Initializable, UserStatusListener, Me
 		
 	
 	public void Logout(ActionEvent event) {
-		
-		//client.connect();
 		
 		try {
 			client.logoff();
@@ -79,10 +79,20 @@ public class ChatroomController implements Initializable, UserStatusListener, Me
 			String timeStamp = new Timestamp(System.currentTimeMillis()).toString();
 	        timeStamp = timeStamp.substring(0, timeStamp.length() - 4);	
 	        timeStamp = "[" + timeStamp + "]";
-			String message = txtMessageField.getText();			
-			client.msg(message);
-			txtChatArea.appendText(timeStamp + " " + Main.getUsername() + ": " + message + "\n");
-			txtMessageField.setText("");
+	        
+			String message = txtMessageField.getText();	
+			
+			if(!message.isEmpty()) {
+				client.msg(message);
+				txtChatArea.appendText(timeStamp + " " + Main.getUsername() + ": " + message + "\n");
+				txtMessageField.setText("");
+			}
+			else {
+				Alert alert = new Alert(AlertType.ERROR);
+				alert.setTitle("Message Error");
+				alert.setContentText("Cannot send blank message");
+				alert.showAndWait();
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -95,7 +105,6 @@ public class ChatroomController implements Initializable, UserStatusListener, Me
         timeStamp = "[" + timeStamp + "]";
 		txtChatArea.appendText(timeStamp + " " + login + " is online\n");
 		lstUserList.getItems().add(login);
-		//lstUserList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 	}
 
 	@Override
@@ -105,7 +114,6 @@ public class ChatroomController implements Initializable, UserStatusListener, Me
         timeStamp = "[" + timeStamp + "]";
 		txtChatArea.appendText(timeStamp + " " + login + " is offline\n");
 		lstUserList.getItems().remove(login);
-		//lstUserList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 	}
 
 	@Override
@@ -128,8 +136,6 @@ public class ChatroomController implements Initializable, UserStatusListener, Me
 		client = Main.getClient();
 		
 		client.addUserStatusListener(this);
-		client.addMessageListener(this);
-		
+		client.addMessageListener(this);	
 	}
-
 }

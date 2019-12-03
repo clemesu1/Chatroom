@@ -59,7 +59,6 @@ public class LoginController {
 			Stage stage = (Stage) btnLoginUser.getScene().getWindow();
 			stage.close();
 			
-			//client.closeConnection();
 	    }
 	    else {
 	    	Alert alert = new Alert(AlertType.ERROR);
