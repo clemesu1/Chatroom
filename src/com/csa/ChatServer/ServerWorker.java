@@ -14,6 +14,9 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.csa.ChatServer.encryption.Crypto;
+import com.csa.ChatServer.encryption.PasswordEncryption;
+
 public class ServerWorker extends Thread {
 
     private final Socket clientSocket;
@@ -28,6 +31,8 @@ public class ServerWorker extends Thread {
     private File database;
     private FileWriter fileWriter;
     private BufferedReader fileReader;
+    
+    private Crypto crypto = new PasswordEncryption();	
 
 
     public ServerWorker(Server server, Socket clientSocket) throws IOException {
@@ -114,7 +119,10 @@ public class ServerWorker extends Thread {
             database = new File(fileLocation);
             		
             fileWriter = new FileWriter(database, true);
-            fileWriter.write(password);
+            
+            String filePassword = new String(crypto.encrypt(password.getBytes()));
+            
+            fileWriter.write(filePassword);
             fileWriter.close();
             
             User user = new User(username, password);
@@ -146,7 +154,8 @@ public class ServerWorker extends Thread {
 	    				fileReader = new BufferedReader(new FileReader(file));
 	    				String passwordCheck = fileReader.readLine();
 	    				fileReader.close();
-	    				if(passwordCheck.equals(password)) {
+	    				String decryptPassword = new String(crypto.decrypt(passwordCheck.getBytes()));
+	    				if(decryptPassword.equals(password)) {
 	    					hasFile = true;
 	    					break;
 	    				}
