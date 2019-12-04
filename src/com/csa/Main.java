@@ -1,18 +1,20 @@
 package com.csa;
 
+import java.util.HashSet;
+
 import com.csa.ChatClient.ChatClient;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-
 import javafx.stage.Stage;
 
 public class Main extends Application {
 	
 	private static ChatClient client;
 	private static String username;
+	private static HashSet<String> userList;
 		
 	@Override
 	public void start(Stage primaryStage) {
@@ -47,5 +49,13 @@ public class Main extends Application {
 	
 	public static String getUsername() {
 		return username;
+	}
+	
+	public static void setUserSet(HashSet<String> userSet) {
+		userList = userSet;
+	}
+	
+	public static HashSet<String> getUserList() {
+		return userList;
 	}
 }

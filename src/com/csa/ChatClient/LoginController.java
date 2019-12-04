@@ -35,37 +35,57 @@ public class LoginController {
 	public void LoginUser(ActionEvent event) throws IOException {
 		
 		client = Main.getClient();
-		client.connect();
+		
+		client.addUserStatusListener(new UserStatusListener() {
+
+			@Override
+			public void online(String login) {
+				System.out.println("ONLINE: " + login);
+			}
+
+			@Override
+			public void offline(String login) {
+				System.out.println("OFFLINE: " + login);
+			}
+		});
 		
 		String username = txtLoginUsername.getText();
 		String password = txtLoginPassword.getText();
 		
-		if(client.login(username, password)) {
-			
-			Main.setUsername(username);
-			FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/csa/ChatClient/Chatroom.fxml"));
-			
-			Parent root = loader.load();
-			
-			Scene scene = new Scene(root,600,500);
-			Stage primaryStage = new Stage();
+		if(client.connect()) {
+			if(client.login(username, password)) {
 
-			primaryStage.setScene(scene);
-			primaryStage.setTitle("Chatroom");
-			primaryStage.setResizable(false);
-			primaryStage.setTitle("Chatroom");
-			primaryStage.show();
-			
-			Stage stage = (Stage) btnLoginUser.getScene().getWindow();
-			stage.close();
-			
-	    }
-	    else {
-	    	Alert alert = new Alert(AlertType.ERROR);
-			alert.setTitle("Login Error");
-			alert.setContentText("Error with user login.");
+				Main.setUsername(username);
+				FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/csa/ChatClient/Chatroom.fxml"));
+				
+				Parent root = loader.load();
+				
+				Scene scene = new Scene(root,600,500);
+				Stage primaryStage = new Stage();
+
+				primaryStage.setScene(scene);
+				primaryStage.setTitle("Chatroom");
+				primaryStage.setResizable(false);
+				primaryStage.setTitle("Chatroom");
+				primaryStage.show();
+				
+				Stage stage = (Stage) btnLoginUser.getScene().getWindow();
+				stage.close();
+				
+		    }
+		    else {
+		    	Alert alert = new Alert(AlertType.ERROR);
+				alert.setTitle("Login Error");
+				alert.setContentText("Error with user login.");
+				alert.showAndWait();
+		    }
+		}
+		else {
+			Alert alert = new Alert(AlertType.ERROR);
+			alert.setTitle("Connection Error");
+			alert.setContentText("Error with connecting to server.");
 			alert.showAndWait();
-	    }
+		}
 	}
 	
 	public void RegisterWindow(ActionEvent event) {

@@ -1,6 +1,11 @@
 package com.csa.ChatClient;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
 
@@ -23,63 +28,19 @@ public class ChatClient {
         this.serverPort = serverPort;
     }
 
-    /*public static void main(String[] args) throws IOException {
-        ChatClient client = new ChatClient("localhost", 8818);  // Create a new instance of the client
-        
-        client.addUserStatusListener(new UserStatusListener() {
-            @Override
-            public void online(String login) {
-                System.out.println("ONLINE: " + login);
-            }
-
-            @Override
-            public void offline(String login) {
-                System.out.println("OFFLINE: " + login);
-            }
-        });
-
-        client.addMessageListener(new MessageListener() {
-            @Override
-            public void onMessage(String fromLogin, String msgBody) {
-                System.out.println("You got a message from " + fromLogin + " ===>" + msgBody);
-            }
-        });
-
-        if(!client.connect()) {
-            System.err.println("Connect failed.");
-        }
-        else {
-            System.out.println("Connection successful.");
-//            String username = null;
-//            String password = null;
-//
-//                
-//            if(client.register(username, password)) {
-//                System.out.println("Register Successful");
-//            }
-//            else {
-//                System.err.println("Register Failed");
-//            }
-//                }
-//                
-//          if(client.login(username, password)) {
-//          System.out.println("Login Successful");
-//          //client.msg("test", "hello world");
-//      }
-//      else {
-//          System.err.println("Login Failed");
-//      }
-        }
-    }*/
-
     public void msg(String msgBody) throws IOException {
         String cmd = "msg " + msgBody + "\n";
         serverOut.write(cmd.getBytes());
     }
 
     public void logoff() throws IOException {
-        String cmd = "quit\n\r";
+        String cmd = "quit\n";
         serverOut.write(cmd.getBytes());
+    }
+    
+    public void sendFile(File file) throws IOException {
+    	
+    	
     }
 
     public boolean register(String username, String password) throws IOException {
@@ -96,14 +57,14 @@ public class ChatClient {
         }
 
     }
-
+    
     public boolean login(String username, String password) throws IOException {
         String cmd = "login " + username + " " + password + "\n";
         serverOut.write(cmd.getBytes());
         String response = bufferedIn.readLine();
         System.out.println("Response Line: " + response);
 
-        if(("login " + username).equalsIgnoreCase(response)) {
+        if(("ok login").equalsIgnoreCase(response)) {
             startMessageReader();
             return true;
         }
@@ -161,18 +122,18 @@ public class ChatClient {
         }
 
     }
+        
+    private void handleOnline(String[] tokens) {
+        String login = tokens[1];
+        for(UserStatusListener listener : userStatusListeners) {
+            listener.online(login);
+        }
+    }
 
     private void handleOffline(String[] tokens) {
         String login = tokens[1];
         for(UserStatusListener listener : userStatusListeners) {
             listener.offline(login);
-        }
-    }
-
-    private void handleOnline(String[] tokens) {
-        String login = tokens[1];
-        for(UserStatusListener listener : userStatusListeners) {
-            listener.online(login);
         }
     }
 

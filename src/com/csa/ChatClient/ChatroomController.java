@@ -5,12 +5,13 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.Timestamp;
-import java.util.HashSet;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.ResourceBundle;
 
 import com.csa.Main;
-import com.csa.ChatServer.ServerWorker;
 
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -25,9 +26,12 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 public class ChatroomController implements Initializable, UserStatusListener, MessageListener {
+	
+	/* CHATROOM */
 	@FXML
 	private Label lblWelcome;
 	
@@ -41,12 +45,11 @@ public class ChatroomController implements Initializable, UserStatusListener, Me
 	private Button btnSend;
 	
 	@FXML
-	private ListView<String> lstUserList = new ListView<>();
+	private ListView<String> lstUserList;
 	
 	@FXML
 	private Hyperlink btnLogout;
 	
-    
 	private ChatClient client;
 	
 	private File chatlog = new File("C:\\Users\\coliw\\OneDrive\\Documents\\GitHub\\Chatroom\\src\\com\\csa\\ChatServer\\database\\chatroom.log");
@@ -80,8 +83,8 @@ public class ChatroomController implements Initializable, UserStatusListener, Me
 	public void sendMessage(ActionEvent event) {
 		
 		try {
-			String timeStamp = new Timestamp(System.currentTimeMillis()).toString();
-	        timeStamp = timeStamp.substring(0, timeStamp.length() - 4);	
+			Timestamp time = new Timestamp(new Date().getTime());
+	        String timeStamp = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(time);
 	        timeStamp = "[" + timeStamp + "]";
 	        
 			String message = txtMessageField.getText();	
@@ -105,14 +108,53 @@ public class ChatroomController implements Initializable, UserStatusListener, Me
 			e.printStackTrace();
 		}
 	}
+	
+	/* FILE SHARING */
+	@FXML
+	private Label lblFileChosen;
+	
+	@FXML
+	private ListView<File> lstFileList; 
+	
+	private File file;
+	
+	public void chooseFile(ActionEvent event) {
+		FileChooser fileChooser = new FileChooser();
+		file = fileChooser.showOpenDialog(null);
+		
+		if(file != null)
+			lblFileChosen.setText("File Chosen: " + file.getName());
+		else {
+			Alert alert = new Alert(AlertType.ERROR);
+			alert.setTitle("File Error");
+			alert.setContentText("Error with file selected");
+			alert.showAndWait();
+		}
+	}
+	
+	public void uploadFile(ActionEvent event) {
+		if(file != null)
+			lstFileList.getItems().add(file);
+		else {
+			Alert alert = new Alert(AlertType.ERROR);
+			alert.setTitle("File Upload Error");
+			alert.setContentText("File does not exist");
+			alert.showAndWait();
+			
+		}
+	}
 
 	@Override
 	public void online(String login) {
-		String timeStamp = new Timestamp(System.currentTimeMillis()).toString();
-        timeStamp = timeStamp.substring(0, timeStamp.length() - 4);	
+		
+		Timestamp time = new Timestamp(new Date().getTime());
+        String timeStamp = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(time);
         timeStamp = "[" + timeStamp + "]";
-		String chatMessage = timeStamp + " " + login + " is online\n";
+        
+		String chatMessage =  timeStamp + " " + login + " is online\n";
+		
 		txtChatArea.appendText(chatMessage);
+		
 		try {
 			fileWriter = new FileWriter(chatlog, true);
 			fileWriter.write(chatMessage);
@@ -121,16 +163,24 @@ public class ChatroomController implements Initializable, UserStatusListener, Me
 			e.printStackTrace();
 		}
 		
-		lstUserList.getItems().add(login);
+		Platform.runLater(new Runnable(){
+			@Override
+			public void run() {
+				lstUserList.getItems().add(login);
+			}
+		});
+		
 	}
 
 	@Override
 	public void offline(String login) {
-		String timeStamp = new Timestamp(System.currentTimeMillis()).toString();
-        timeStamp = timeStamp.substring(0, timeStamp.length() - 4);	
+	
+		Timestamp time = new Timestamp(new Date().getTime());
+        String timeStamp = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(time);
         timeStamp = "[" + timeStamp + "]";
-        String chatMessage = timeStamp + " " + login + " is offline\n";
+        String chatMessage = timeStamp + " " +  login + " is offline\n";
 		txtChatArea.appendText(chatMessage);
+		
 		try {
 			fileWriter = new FileWriter(chatlog, true);
 			fileWriter.write(chatMessage);
@@ -138,29 +188,34 @@ public class ChatroomController implements Initializable, UserStatusListener, Me
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		lstUserList.getItems().remove(login);
+		
+		Platform.runLater(new Runnable(){
+			@Override
+			public void run() {
+				lstUserList.getItems().remove(login);
+			}
+		});
 	}
 
 	@Override
 	public void onMessage(String fromLogin, String msgBody) {
-		String timeStamp = new Timestamp(System.currentTimeMillis()).toString();
-        timeStamp = timeStamp.substring(0, timeStamp.length() - 4);	
+		Timestamp time = new Timestamp(new Date().getTime());
+        String timeStamp = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(time);
         timeStamp = "[" + timeStamp + "]";
 		String line = fromLogin + ": " + msgBody;
 		txtChatArea.appendText(timeStamp + " " + line + "\n");
-		
 	}
 
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
 		lblWelcome.setText("Welcome " + Main.getUsername() + "!");
-		
-		HashSet<String> nameSet = ServerWorker.getNameSet();
-		lstUserList.getItems().addAll(nameSet);	
+				
+		lstUserList.getItems().add(Main.getUsername());
 		
 		client = Main.getClient();
 		
 		client.addUserStatusListener(this);
 		client.addMessageListener(this);	
+		
 	}
 }

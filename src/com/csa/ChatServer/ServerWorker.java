@@ -97,8 +97,7 @@ public class ServerWorker extends Thread {
             String fileLocation = directory + fileName;
             
             database = new File(fileLocation);
-            		
-            fileWriter = new FileWriter(database, true);
+			fileWriter = new FileWriter(database, true);
             
             String filePassword = new String(crypto.encrypt(password.getBytes()));
             
@@ -111,7 +110,9 @@ public class ServerWorker extends Thread {
             String msg = username + " registered\n";
             outputStream.write(msg.getBytes());
             System.out.println("User " + username + " has registered successfully");
+
         }
+            
     }
     
     private void handleLogin(OutputStream outputStream, String[] tokens) throws IOException {
@@ -151,37 +152,33 @@ public class ServerWorker extends Thread {
 	    	}
 	    	
 	    	if(hasFile || inUserSet) {
-	    		 String msg = "login " + username + "\n";
+	    		 String msg = "ok login\n";
                  outputStream.write(msg.getBytes()); // Sends output back to the client
-                 
                  this.login = username; // Set login of this server worker to the user entered login string
-                 
-                 System.out.println("User " + username + " has logged in successfully");
+                 System.out.println("User has logged in successfully: " + login);
 
                  List<ServerWorker> workerList = server.getWorkerList();
 
-                 // Send the current user all other online user's username's
+                 // Send current user all other users online
                  for(ServerWorker worker : workerList) {
-                     if(!username.equals(worker.getLogin())) {  // Stops it from sending yourself your own online status
-                         if(worker.getLogin() != null) {
-                             String localMsg = "online " + worker.getLogin() + "\n";
-                             send(localMsg);
-                         }
-                     }
-                 }
-
-                 // Send other online users current user's online status
-                 String onlineMsg = username + " is online\n";
-                 for(ServerWorker worker : workerList) {
-                     if(!username.equals(worker.getLogin())) {  // Stops it from sending yourself your own online status
-                         worker.send(onlineMsg);
-                     }
+                	 if(worker.getLogin() != null) {
+                		 if(!login.equals(worker.getLogin())) {
+	                		 String onlineUsers = "online " + worker.getLogin() + "\n";
+	                		 send(onlineUsers);
+                		 }
+                	 }
                  }
                  
+                 String onlineMsg = "online " + login + "\n";
+                 for(ServerWorker worker : workerList) {
+                	 if(!login.equals(worker.getLogin())) {
+                    	 worker.send(onlineMsg);
+                	 }
+                 }
              }
              else {
-                 String msg = "Login Error\n";
-                 outputStream.write(msg.getBytes()); // Sends output back to the client
+                 String msg = "error login\n";
+                 outputStream.write(msg.getBytes());
                  System.err.println("Login failed for " + username);
              }
     	}
@@ -201,9 +198,8 @@ public class ServerWorker extends Thread {
         	}
         }
     }
-
+    
     private void handleLogOff() throws IOException {
-        server.removeWorker(this);
         List<ServerWorker> workerList = server.getWorkerList();
 
         String offlineMsg = "offline " + login + "\n";
@@ -212,9 +208,10 @@ public class ServerWorker extends Thread {
                 worker.send(offlineMsg);
             }
         }
+        server.removeWorker(this);
         clientSocket.close();   // Close the client socket
     }
-
+    
     public String getLogin() {
         return login;
     }
@@ -225,10 +222,4 @@ public class ServerWorker extends Thread {
         }
     }
     
-    public static HashSet<String> getNameSet() {
-    	for(User user : userSet) {
-    		nameSet.add(user.getUsername());
-    	}
-    	return nameSet;
-    }
 }
