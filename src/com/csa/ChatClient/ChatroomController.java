@@ -52,9 +52,6 @@ public class ChatroomController implements Initializable, UserStatusListener, Me
 	
 	private ChatClient client;
 	
-	private File chatlog = new File("C:\\Users\\coliw\\OneDrive\\Documents\\GitHub\\Chatroom\\src\\com\\csa\\ChatServer\\database\\chatroom.log");
-	private FileWriter fileWriter;	
-	
 	public void Logout(ActionEvent event) {
 		
 		try {
@@ -93,9 +90,7 @@ public class ChatroomController implements Initializable, UserStatusListener, Me
 				client.msg(message);
 				String chatMessage = timeStamp + " " + Main.getUsername() + ": " + message + "\n";
 				txtChatArea.appendText(chatMessage);
-				fileWriter = new FileWriter(chatlog, true);
-				fileWriter.write(chatMessage);
-				fileWriter.close();
+				
 				txtMessageField.setText("");
 			}
 			else {
@@ -155,14 +150,6 @@ public class ChatroomController implements Initializable, UserStatusListener, Me
 		
 		txtChatArea.appendText(chatMessage);
 		
-		try {
-			fileWriter = new FileWriter(chatlog, true);
-			fileWriter.write(chatMessage);
-			fileWriter.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
 		Platform.runLater(new Runnable(){
 			@Override
 			public void run() {
@@ -181,13 +168,6 @@ public class ChatroomController implements Initializable, UserStatusListener, Me
         String chatMessage = timeStamp + " " +  login + " is offline\n";
 		txtChatArea.appendText(chatMessage);
 		
-		try {
-			fileWriter = new FileWriter(chatlog, true);
-			fileWriter.write(chatMessage);
-			fileWriter.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 		
 		Platform.runLater(new Runnable(){
 			@Override

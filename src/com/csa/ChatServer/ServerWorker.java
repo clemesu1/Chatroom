@@ -9,6 +9,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 
@@ -33,6 +36,9 @@ public class ServerWorker extends Thread {
     private BufferedReader fileReader;
         
     private Crypto crypto = new PasswordEncryption();	
+    
+    private File chatlog = new File("C:\\Users\\coliw\\OneDrive\\Documents\\GitHub\\Chatroom\\src\\com\\csa\\ChatServer\\database\\chatroom.log");
+	private FileWriter chatlogWriter;	
 
     public ServerWorker(Server server, Socket clientSocket) throws IOException {
         this.server = server;
@@ -156,7 +162,14 @@ public class ServerWorker extends Thread {
                  outputStream.write(msg.getBytes()); // Sends output back to the client
                  this.login = username; // Set login of this server worker to the user entered login string
                  System.out.println("User has logged in successfully: " + login);
-
+                 
+                 String online = login + " is online\n";
+                 Timestamp time = new Timestamp(new Date().getTime());
+                 String timeStamp = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(time);
+                 timeStamp = "[" + timeStamp + "] ";
+                 chatlogWriter = new FileWriter(chatlog, true);
+     			 chatlogWriter.write(timeStamp + online);
+         		 chatlogWriter.close();
                  List<ServerWorker> workerList = server.getWorkerList();
 
                  // Send current user all other users online
@@ -191,6 +204,16 @@ public class ServerWorker extends Thread {
         
         String msgBody = tokens[1];
         
+		Timestamp time = new Timestamp(new Date().getTime());
+        String timeStamp = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(time);
+        timeStamp = "[" + timeStamp + "] ";
+        
+        String messageLog = timeStamp + login + ": " + msgBody + "\n";
+        
+		chatlogWriter = new FileWriter(chatlog, true);
+		chatlogWriter.write(messageLog);
+		chatlogWriter.close();
+		
         for(ServerWorker worker : workerList) {
         	if(!login.equals(worker.getLogin())) {
         		String outMsg = "msg " + login + " " + msgBody + "\n";
@@ -203,6 +226,15 @@ public class ServerWorker extends Thread {
         List<ServerWorker> workerList = server.getWorkerList();
 
         String offlineMsg = "offline " + login + "\n";
+        
+        String offline = login + " is offline\n";
+        Timestamp time = new Timestamp(new Date().getTime());
+        String timeStamp = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(time);
+        timeStamp = "[" + timeStamp + "] ";
+        chatlogWriter = new FileWriter(chatlog, true);
+		chatlogWriter.write(timeStamp + offline);
+		chatlogWriter.close();
+		
         for(ServerWorker worker : workerList) {
             if(!login.equals(worker.getLogin())) {  // Stops it from sending yourself your own online status
                 worker.send(offlineMsg);
